@@ -1,100 +1,127 @@
-(function($) {
-    "use strict";
-    //patients datatable
-    var table = $('#table').DataTable({
-        dom: "<'row'<'col-sm-4'l><'col-sm-4 text-center'B><'col-sm-4'f>>" +
-            "<'row'<'col-sm-12'tr>>" +
-            "<'row'<'col-sm-4'i><'col-sm-8'p>>",
-        buttons: [],
-        "processing": true,
-        "serverSide": true,
-        "bSort": false,
-        fixedHeader: true,
-        "ajax": {
-            url: db_url + "get_product_method_entry"
-        },
-        // orderCellsTop: true,
-        fixedHeader: true,
-        "columns": [
-            { data: "id" },
-            { data: "pattern_name" },
-            { data: "test_name_eng" },
-            { data: "remarks" },
-            { data: "status" },
-            { data: "action", searchable: false, orderable: false, sortable: false } //action
-        ],
-        "language": {
-            "sEmptyTable": trans("No data available in table"),
-            "sInfo": trans("Showing") + " _START_ " + trans("to") + " _END_ " + trans("of") + " _TOTAL_ " + trans("records"),
-            "sInfoEmpty": trans("Showing") + " 0 " + trans("to") + " 0 " + trans("of") + " 0 " + trans("records"),
-            "sInfoFiltered": "(" + trans("filtered") + " " + trans("from") + " _MAX_ " + trans("total") + " " + trans("records") + ")",
-            "sInfoPostFix": "",
-            "sInfoThousands": ",",
-            "sLengthMenu": trans("Show") + " _MENU_ " + trans("records"),
-            "sLoadingRecords": trans("Loading..."),
-            "sProcessing": trans("Processing..."),
-            "sSearch": trans("Search") + ":",
-            "sZeroRecords": trans("No matching records found"),
-            "oPaginate": {
-                "sFirst": trans("First"),
-                "sLast": trans("Last"),
-                "sNext": trans("Next"),
-                "sPrevious": trans("Previous")
-            },
-        }
-    });
+$(document).ready(function() {
 
     //active
-    $('#product_method_entry').addClass('active');
-
-
-    $('#form').validate({
-        rules: {
-            name_eng: {
-                required: true
-            },
-            ph1: {
-                required: true
-            },
-            address1: {
-                required: true
-            }
-
-        },
-        errorElement: 'span',
-        errorPlacement: function(error, element) {
-            error.addClass('invalid-feedback');
-            element.closest('.form-group').append(error);
-        },
-        highlight: function(element, errorClass, validClass) {
-            $(element).addClass('is-invalid');
-        },
-        unhighlight: function(element, errorClass, validClass) {
-            $(element).removeClass('is-invalid');
+    $('#product').addClass('active');
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+    $('#ajax-crud-datatable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: " {{ route('admin.product.index') }}",
+        columns: [{
+                data: 'id',
+                name: 'id'
+            },
+            {
+                data: 'product_name',
+                name: 'product_name'
+            },
 
-    //delete patient
-    $(document).on('click', '.delete_patient', function(e) {
-        e.preventDefault();
-        var el = $(this);
-        swal({
-            title: trans("Are you sure to delete Product Registration  ?"),
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonClass: "btn-danger",
-            confirmButtonText: trans("Delete"),
-            cancelButtonText: trans("Cancel"),
-            closeOnConfirm: false
-        }).then((willDelete) => {
-            if (willDelete) {
-                $(el).parent().submit();
-            }
-        })
+            {
+                data: 'product_code',
+                name: 'product_code'
+            },
+
+            {
+                data: 'action',
+                name: 'action',
+                orderable: false
+            },
+        ],
+        order: [
+            [0, 'desc']
+        ]
     });
+});
 
-})(jQuery);
+function add() {
+    $('#CompanyForm').trigger("reset");
+    $('#CompanyModal').html("Add Product");
+    $('#company-modal').modal('show');
+    $('#id').val('');
+}
 
-$(document).ready(function() {
-    $('table.display').DataTable();
+function editFunc(id) {
+    $.ajax({
+        type: "POST",
+        url: "{{ route('admin.product.edit') }}",
+        data: {
+            id: id
+        },
+        dataType: 'json',
+        success: function(res) {
+            $('#CompanyModal').html("Edit Company");
+            $('#company-modal').modal('show');
+            $('#id').val(res.id);
+            $('#product_name').val(res.product_name);
+            $('#product_code').val(res.product_code);
+        }
+    });
+}
+
+function deleteFunc(id) {
+    if (confirm("Delete Record?") == true) {
+        var id = id;
+        // ajax
+        $.ajax({
+            type: "POST",
+            url: "{{ route('admin.product.delete') }}",
+            data: {
+                id: id
+            },
+            dataType: 'json',
+            success: function(res) {
+                var oTable = $('#ajax-crud-datatable').dataTable();
+                oTable.fnDraw(false);
+            }
+        });
+    }
+}
+$('#CompanyForm').submit(function(e) {
+    e.preventDefault();
+    var formData = new FormData(this);
+    $.ajax({
+        type: 'POST',
+        url: "{{ route('admin.product.store') }}",
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: (data) => {
+            $("#company-modal").modal('hide');
+            var oTable = $('#ajax-crud-datatable').dataTable();
+            oTable.fnDraw(false);
+            $("#btn-save").html('Save changes');
+            $("#btn-save").attr("disabled", false);
+        },
+        error: function(data) {
+            console.log(data);
+        }
+    });
+});
+$('#CompanyForm').validate({
+    rules: {
+        product_name: {
+            required: true
+        },
+        product_code: {
+            required: true,
+            number: true
+        },
+
+    },
+    errorElement: 'span',
+    errorPlacement: function(error, element) {
+        error.addClass('invalid-feedback');
+        element.closest('.form-group').append(error);
+    },
+    highlight: function(element, errorClass, validClass) {
+        $(element).addClass('is-invalid');
+    },
+    unhighlight: function(element, errorClass, validClass) {
+        $(element).removeClass('is-invalid');
+    }
 });

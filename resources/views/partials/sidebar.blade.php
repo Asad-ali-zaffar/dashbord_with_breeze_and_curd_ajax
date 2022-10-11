@@ -2,7 +2,7 @@
 <aside class="main-sidebar sidebar-dark-primary  ">
     <!-- Brand Logo -->
     <a href="#" class="brand-link">
-      <img src="{{url('public/img/logo_sidebar.png')}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3">
+      <img src="{{url('img/logo_sidebar.png')}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3">
       <span class="brand-text font-weight-light"></span>
     </a>
     <!-- \Brand Logo -->

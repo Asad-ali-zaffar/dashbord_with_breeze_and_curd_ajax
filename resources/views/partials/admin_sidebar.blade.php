@@ -23,16 +23,16 @@
             <a href="#" class="nav-link" id="prices_link">
                 <i class="nav-icon fas fa-list"></i>
                 <p>
-                    {{ __('Administration') }}
+                    {{ __('Product') }}
                     <i class="right fas fa-angle-left"></i>
                 </p>
             </a>
             <ul class="nav nav-treeview">
                 <li class="nav-item">
-                    {{-- {{-- {{ route('admin.doctors.index') }} --}}
-                    <a href="" class="nav-link" id="doctors">
+                    <a href="
+                    {{ route('admin.product.index') }}" class="nav-link" id="product">
                         <i class="far fa-circle nav-icon"></i>
-                        <p>{{ __('Doctors') }}</p>
+                        <p>{{ __('Products') }}</p>
                     </a>
                 </li>
             </ul>
@@ -352,5 +352,5 @@
 
 
     </ul>
-    
+
 </nav>

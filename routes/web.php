@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{ProfileController};
+use App\Http\Controllers\{ProfileController, Admin\ProductController};
 
 /*
 |--------------------------------------------------------------------------
@@ -31,7 +31,14 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
             Route::get('edit', [ProfileController::class, 'edit'])->name('edit');
             Route::post('update', [ProfileController::class, 'update'])->name('update');
         });
+        Route::group(['prefix' => 'product', 'as' => 'product.'], function () {
+            Route::get('index', [ProductController::class, 'index'])->name('index');
+            Route::post('store-company', [ProductController::class, 'store'])->name('store');
+            Route::post('edit-company', [ProductController::class, 'edit'])->name('edit');
+            Route::post('delete-company', [ProductController::class, 'destroy'])->name('delete');
+        });
     });
 });
+
 
 require __DIR__ . '/auth.php';
